@@ -84,7 +84,7 @@ final class ExportButtonGridListener
         ];
 
         $currentRequest = $this->requestStack->getCurrentRequest();
-        if ($this->resource==='sylius.order'&&$currentRequest) {
+        if ($this->resource==='sylius.order'&&$currentRequest&&isset($currentRequest->query->getIterator()->getArrayCopy()['criteria'])) {
             // @TODO Find way to validate the list of criteria injected
             $parameters['criteria'] = $currentRequest->query->getIterator()->getArrayCopy()['criteria'];
         }
