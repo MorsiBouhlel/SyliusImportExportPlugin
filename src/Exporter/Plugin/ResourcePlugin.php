@@ -24,7 +24,7 @@ class ResourcePlugin implements PluginInterface
     protected $entityManager;
 
     /** @var array */
-    protected $data;
+    public $data;
 
     /** @var ResourceInterface[] */
     protected $resources;

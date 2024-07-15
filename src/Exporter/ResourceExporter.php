@@ -61,7 +61,19 @@ class ResourceExporter implements ResourceExporterInterface
         $this->pluginPool->initPlugins($idsToExport);
         $this->writer->write($this->resourceKeys);
 
+        $idsToAddInExport = [];
+        foreach ($this->pluginPool->getPlugins()[0]->data as $id => $oneData){
+            if(!is_int($id)){
+                $idsToAddInExport[$id] = $id;
+            }
+        }
+
         foreach ($idsToExport as $id) {
+            $key = 1;
+            while(isset($idsToAddInExport[$id.'_'.$key])){
+                $this->writeDataForId((string) $id.'_'.$key);
+                $key++;
+            }
             $this->writeDataForId((string) $id);
         }
     }

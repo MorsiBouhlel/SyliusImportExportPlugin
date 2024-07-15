@@ -45,21 +45,32 @@ class OrderResourcePlugin extends ResourcePlugin
 
         /** @var OrderInterface $resource */
         foreach ($this->resources as $resource) {
-            // insert general fields
-            $this->addGeneralData($resource);
-
-            // insert customer information to specific fields
-            $this->addCustomerData($resource);
-
-            // insert shippingaddress to the specific field
-            $this->addShippingAddressData($resource);
-
-            // insert billingaddress to the specific field
-            $this->addBillingAddressData($resource);
-
             $items = $this->getItemsAndCount($resource);
+            $itemCount = 0;
 
-            $this->addOrderItemData($items, $resource);
+            foreach ($items as $key => $item) {
+                $oneItem = [];
+                if($itemCount>0){
+                    $this->data[$resource->getId().'_'.$itemCount] = $this->data[$resource->getId()];
+                }
+                // insert general fields
+                $this->addGeneralData($resource);
+
+                // insert customer information to specific fields
+                $this->addCustomerData($resource);
+
+                // insert shippingaddress to the specific field
+                $this->addShippingAddressData($resource);
+
+                // insert billingaddress to the specific field
+                $this->addBillingAddressData($resource);
+
+                $oneItem[$key] = $item;
+
+                $this->addOrderItemData($oneItem, $resource);
+
+                $itemCount++;
+            }
         }
     }
 
@@ -126,13 +137,13 @@ class OrderResourcePlugin extends ResourcePlugin
             /** @var ProductInterface $product */
             $product = $variant->getProduct();
 
-            if (!isset($items[$product->getId()])) {
-                $items[$product->getId()] = [
+            if (!isset($items[$product->getCode()])) {
+                $items[$product->getCode()] = [
                     'name' => $product->getName(),
                     'count' => 0,
                 ];
             }
-            $items[$product->getId()]['count'] += $orderItem->getQuantity();
+            $items[$product->getCode()]['count'] += $orderItem->getQuantity();
         }
 
         return $items;
@@ -146,7 +157,7 @@ class OrderResourcePlugin extends ResourcePlugin
             if (!empty($str)) {
                 $str .= ' | ';
             }
-            $str .= sprintf('%dx %s(id:%d)', $item['count'], $item['name'], $itemId);
+            $str .= sprintf('%dx %s(code:%d)', $item['count'], $item['name'], $itemId);
         }
 
         $this->addDataForResource($resource, 'Product_list', $str);
